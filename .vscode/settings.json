@@ -1,0 +1,35 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "MuseMotion_mine",
+            "database": "musemotion_db",
+            "username": "root",
+            "password": "SQLforMe344%"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "MuseMotion_mine1",
+            "database": "musemotion_db",
+            "username": "root",
+            "password": "SQLforMe344%",
+            "connectionTimeout": 30
+        }
+    ]
+}

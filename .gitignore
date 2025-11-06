@@ -1,0 +1,12 @@
+# Ignore environment variables
+.env
+
+# Ignore Python cache
+_pycache_/
+*.pyc
+
+echo ".env" >> .gitignore
+
+# Ignore any local data files you don’t want in GitHub
+*.csv
+*.xlsx
