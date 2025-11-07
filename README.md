@@ -32,6 +32,8 @@ Cloud Platform:
 - Microsoft Azure.
 
 ## 📷 Project Structure
+
+```
 MuseMotion/  
 ├── data/                   # Data storage folder.  
 │   ├── raw/                # Unprocessed CSV/JSON files (source data).  
@@ -42,7 +44,6 @@ MuseMotion/
 │   ├── queries.sql         # Analysis queries (joins, aggregations, CTEs, CRUD).  
 │   └── analysis.sql        # Insight-driven queries and reports.  
 │ 
-<<<<<<< HEAD
 ├── src/                    # Core Python ETL code. 
 │   ├── extract.py          # Data extraction from local or external sources. 
 │   ├── transform.py        # Data cleaning, formatting, and validation. 
@@ -65,30 +66,8 @@ MuseMotion/
 └── docs/                    # Documentation and sprint planning.
   ├── sprint_plan_week4.md   # Week 4 sprint overview and team tasks. 
   └── architecture_diagram.png # Visual diagram of ETL and cloud architecture.
-=======
-├── src/                    # Core Python ETL code.  
-│   ├── extract.py          # Data extraction from local or external sources.  
-│   ├── transform.py # Data cleaning, formatting, and validation.  
-│   ├── load.py # Load processed data into SQLite and Azure SQL.  
-│   └── utils.py # Helper functions (logging, config, error handling).  
-│ 
-├── dashboard/ # Optional visualisation interface.  
-│   └── app.py # Streamlit dashboard for data exploration and metrics.  
-│ 
-├── config/ # Configuration and environment setup.  
-│   ├── .env.example # Template for environment variables.  
-│   └── azure_config.json # Azure connection details (non-sensitive placeholders).  
-│ 
-├── tests/ # Unit and integration tests for ETL components.  
-│ ├── test_etl.py # Tests for data extraction, transformation, and loading.  
-│ └── test_sql.py # Tests for SQL queries and schema validation.  
-│ 
-├── requirements.txt # Project dependencies (pandas, SQLAlchemy, azure-storage-blob, Streamlit, etc.)  
-├── README.md # Project documentation (this file).  
-└── docs/ # Documentation and sprint planning.  
-  ├── sprint_plan_week4.md # Week 4 sprint overview and team tasks.  
-  └── architecture_diagram.png # Visual diagram of ETL and cloud architecture.  
->>>>>>> b22221460635322e0d1ea5349625b275552204c2
+
+```
 
 ## 🗓️ Future Improvements
 - Long-Term Tracking: Extend data collection to analyze EV performance over time, not just single snapshots.
