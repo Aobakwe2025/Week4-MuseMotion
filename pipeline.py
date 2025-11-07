@@ -31,7 +31,7 @@ ssl_arg = f"?ssl_ca={ssl_ca_path}" if ssl_ca_path else ""
 engine = create_engine(
     f"mysql+pymysql://{RDS_USER}:{RDS_PASSWORD}@{RDS_HOST}:{RDS_PORT}/{RDS_DB}{ssl_arg}"
 )
-print(" MySQL connection ready!")
+print("MySQL connection ready!")
 
 # --- Azure Blob Storage Configuration ---
 AZURE_ACCOUNT_NAME = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
@@ -46,33 +46,33 @@ connection_str = (
 )
 blob_service_client = BlobServiceClient.from_connection_string(connection_str)
 container_client = blob_service_client.get_container_client(AZURE_CONTAINER_NAME)
-print(" Azure Blob Storage connection successful!")
+print("Azure Blob Storage connection successful!")
 
 # --- Function: Download all CSV blobs and merge into a DataFrame ---
 def download_and_merge_csvs():
     all_dfs = []
     for blob in container_client.list_blobs():
         if blob.name.endswith(".csv"):
-            print(f"📥 Downloading {blob.name}...")
+            print(f"Downloading {blob.name}...")
             blob_client = container_client.get_blob_client(blob.name)
             stream = blob_client.download_blob()
             df = pd.read_csv(stream)
             all_dfs.append(df)
     if all_dfs:
         merged_df = pd.concat(all_dfs, ignore_index=True)
-        print(f" Merged {len(all_dfs)} CSV files.")
+        print(f"Merged {len(all_dfs)} CSV files.")
         return merged_df
     else:
-        print(" No CSV files found in the container.")
+        print("No CSV files found in the container.")
         return pd.DataFrame()
 
 # --- Function: Upload DataFrame to MySQL ---
 def upload_df_to_mysql(df, table_name):
     if df.empty:
-        print(" No data to upload.")
+        print("No data to upload.")
         return
     df.to_sql(table_name, con=engine, if_exists='replace', index=False)
-    print(f" Uploaded DataFrame to MySQL table '{table_name}'.")
+    print(f"Uploaded DataFrame to MySQL table '{table_name}'.")
 
 # --- Function: Upload a local file back to Azure Blob ---
 def upload_file_to_blob(local_file_path, blob_name):
@@ -97,4 +97,4 @@ if __name__ == "__main__":
     df.to_csv(merged_csv_path, index=False)
     upload_file_to_blob(merged_csv_path, "merged_musemotion.csv")
     
-    print(" Pipeline completed successfully!")
+    print("Pipeline completed successfully!")
