@@ -83,6 +83,9 @@ def extract_latlon(point_str):
 
 # --- Main Execution ---
 if __name__ == "__main__":
+    # Guarantee scope definition
+    engine = None
+    
     try:
         engine = get_db_engine()
     except Exception as e:
