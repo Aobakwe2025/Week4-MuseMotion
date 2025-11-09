@@ -10,30 +10,35 @@ from dotenv import load_dotenv
 load_dotenv()  # read .env in working dir
 
 USER = os.getenv("DB_USER")
-PW = os.getenv("DB_PASS")
+PW = os.getenv("DB_PASSWORD") # Standardized to DB_PASSWORD
 HOST = os.getenv("DB_HOST", "localhost")
 DB = os.getenv("DB_NAME", "musemotion_db")
 
-# file path --since its my local file path, please put yours
-csv_file = Path(r"C:\Users\luyan\Documents\Luyanda_Dev\capaciti projects\Practice App\musemotion_dataset.csv")
+# --- Use an environment variable, not a hardcoded path ---
+DATA_FILE = os.getenv("DATA_PATH", "musemotion_databse.csv")
+csv_file = Path(DATA_FILE)
+if not csv_file.exists():
+    raise FileNotFoundError(f"Data file not found: {csv_file}. Make sure DATA_PATH is set in .env file.")
+
 chunksize = 2000
 
 # SQLAlchemy engine
 engine = create_engine(f"mysql+pymysql://{USER}:{PW}@{HOST}/{DB}")
 
-# column names ---
-columns_to_keep = [
-    "VIN",
-    "City",
-    "Year",
-    "Make",
-    "Model",
-    "Vehicle Type",
-    "Eligibility",
-    "Electric Range",
-    "Base MSRP",
-    "Location",
-    "Utility"
+# --- CORRECTED column names to match CSV file ---
+# Use lowercase_with_underscores to be consistent
+columns_to_use = [
+    "vin",
+    "city",
+    "year",
+    "make",
+    "model",
+    "vehicle_type", # Corrected (was "Vehicle Type")
+    "eligibility",
+    "electric_range", # Corrected (was "Electric Range")
+    "vehicle_id",     # Corrected (was "Base MSRP")
+    "location",
+    "utility"
 ]
 
 # latitude/longitude extraction
@@ -54,32 +59,34 @@ def extract_lat_lon(point_str):
 
 # process the file in chunks
 cleaned_rows = 0
+print(f"Starting to process {csv_file}...")
 
-for i, chunk in enumerate(pd.read_csv(csv_file, usecols=range(len(columns_to_keep)), chunksize=chunksize, header=None)):
+for i, chunk in enumerate(pd.read_csv(csv_file, usecols=range(len(columns_to_use)), chunksize=chunksize, header=None)):
     # Assign column names
-    chunk.columns = columns_to_keep
+    chunk.columns = columns_to_use
 
     # Clean text fields
-    text_cols = ["VIN", "City", "Make", "Model", "Vehicle Type", "Eligibility", "Utility"]
+    text_cols = ["vin", "city", "make", "model", "vehicle_type", "eligibility", "utility"]
     for c in text_cols:
         chunk[c] = chunk[c].astype(str).str.strip().replace({"nan": pd.NA, "": pd.NA})
 
     # Drop rows missing VIN or City
     before = len(chunk)
-    chunk.dropna(subset=["VIN", "City"], inplace=True)
+    chunk.dropna(subset=["vin", "city"], inplace=True)
     after = len(chunk)
 
-    # Convert numeric fields safely
-    chunk["Year"] = pd.to_numeric(chunk["Year"], errors="coerce").astype("Int64")
-    chunk["Electric Range"] = pd.to_numeric(chunk["Electric Range"], errors="coerce")
-    chunk["Base MSRP"] = pd.to_numeric(chunk["Base MSRP"], errors="coerce")
+    # Convert numeric fields safely (using correct columns)
+    chunk["year"] = pd.to_numeric(chunk["year"], errors="coerce").astype("Int64")
+    chunk["electric_range"] = pd.to_numeric(chunk["electric_range"], errors="coerce")
+    chunk["vehicle_id"] = pd.to_numeric(chunk["vehicle_id"], errors="coerce")
 
     # Extract Latitude & Longitude from Location
-    latitudes, longitudes = zip(*chunk["Location"].map(extract_lat_lon))
-    chunk["Latitude"] = latitudes
-    chunk["Longitude"] = longitudes
+    latitudes, longitudes = zip(*chunk["location"].map(extract_lat_lon))
+    chunk["latitude"] = latitudes
+    chunk["longitude"] = longitudes
 
     # Append cleaned chunk to MySQL
+    # We must match the table name from the other scripts, e.g., "musemotion"
     chunk.to_sql("musemotion_data", con=engine, if_exists="append", index=False, method="multi", chunksize=1000)
 
     cleaned_rows += after
