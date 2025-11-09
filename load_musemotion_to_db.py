@@ -1,11 +1,3 @@
-"""
-Load musemotion_databse.csv into an Azure MySQL or Postgres DB table 'musemotion'.
-This script:
- - reads DATA_PATH (from .env or defaults to musemotion_databse.csv)
- - normalizes column names to: vin,city,year,make,model,vehicle_type,eligibility,electric_range,vehicle_id,location,utility
- - writes to a temporary table then upserts into musemotion (if vin unique)
-"""
-
 import os, re
 from pathlib import Path
 from dotenv import load_dotenv
@@ -16,15 +8,15 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
-load_dotenv()  # loads .env if present
+load_dotenv() 
 
-DB_BACKEND = os.getenv("DB_BACKEND", "mysql").lower()   # 'mysql' or 'postgres'
+DB_BACKEND = os.getenv("DB_BACKEND", "mysql").lower()   
 DB_USER = os.getenv("DB_USER", "root")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "3306")
 DB_NAME = os.getenv("DB_NAME", "musemotion_db")
-# --- Use the CSV file path ---
+# file path
 DATA_PATH = os.getenv("DATA_PATH", "musemotion_databse.csv")
 
 if DB_BACKEND == "mysql":
@@ -39,12 +31,12 @@ else:
 logger.info("Using engine: %s", engine_url)
 engine = create_engine(engine_url, echo=False)
 
-# --- Read CSV ---
+# reads CSV file
 data_path = Path(DATA_PATH)
 if not data_path.exists():
     raise FileNotFoundError(f"Data file not found: {data_path}")
 
-# --- Define your 11 columns in order (lowercase) ---
+# our column names
 target_cols = [
     "vin",
     "city",
@@ -59,20 +51,16 @@ target_cols = [
     "utility"
 ]
 
-# Read the CSV.
-# We assume the first row is data, not headers (header=None).
-# We assign the correct column_names.
+# reads the CSV
 df = pd.read_csv(data_path, header=None, names=target_cols)
 logger.info("Loaded CSV shape: %s", df.shape)
 
-# --- Normalize column names (already done by pd.read_csv) ---
-
-# --- Convert types (using the correct column names) ---
+# convert data types
 df["year"] = pd.to_numeric(df["year"], errors="coerce").astype("Int64")
 df["electric_range"] = pd.to_numeric(df["electric_range"], errors="coerce").astype("Int64")
 df["vehicle_id"] = pd.to_numeric(df["vehicle_id"], errors="coerce").astype("Int64")
 
-# --- Extract lat/long from 'location' column ---
+# extracts lat/long from 'location' column
 point_re = re.compile(r"POINT\s*\(\s*([-\d\.]+)\s+([-\d\.]+)\s*\)")
 
 def extract_latlon(location_str):
@@ -81,8 +69,8 @@ def extract_latlon(location_str):
             return (None, None)
         match = point_re.search(str(location_str))
         if match:
-            lon = float(match.group(1)) # Longitude is first
-            lat = float(match.group(2)) # Latitude is second
+            lon = float(match.group(1)) 
+            lat = float(match.group(2)) 
             return (lat, lon)
     except Exception:
         pass
@@ -95,11 +83,11 @@ if "location" in df.columns:
 else:
     df["latitude"] = None; df["longitude"] = None
 
-# Reorder to include latitude/longitude at end
+# reorder columns to include latitude/longitude at end of the columns
 cols_final = target_cols + ["latitude","longitude"]
 df = df[cols_final]
 
-# --- Write to temporary table then upsert into musemotion
+# writes temporary table then upsert into musemotion
 temp_table = "musemotion_tmp"
 
 logger.info("Writing to temporary table %s (rows=%s)...", temp_table, len(df))
@@ -107,7 +95,7 @@ df.to_sql(temp_table, con=engine, if_exists="replace", index=False, method="mult
 
 with engine.begin() as conn:
     if DB_BACKEND == "mysql":
-        # MySQL upsert using ON DUPLICATE KEY UPDATE (assumes UNIQUE on vin)
+        # MySQL upsert using duplicate key update
         upsert_sql = f"""
         INSERT INTO musemotion (vin, city, year, make, model, vehicle_type, eligibility,
                                electric_range, vehicle_id, location, utility, latitude, longitude)
@@ -131,8 +119,6 @@ with engine.begin() as conn:
         conn.execute(text(upsert_sql))
         conn.execute(text(f"DROP TABLE IF EXISTS {temp_table};"))
     else:
-        # Postgres upsert using ON CONFLICT (vin) DO UPDATE
-        # Ensure unique index on vin exists.
         upsert_sql = f"""
         INSERT INTO musemotion (vin, city, year, make, model, vehicle_type, eligibility,
                                electric_range, vehicle_id, location, utility, latitude, longitude)
