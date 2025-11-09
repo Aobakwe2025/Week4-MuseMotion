@@ -9,11 +9,12 @@ load_dotenv()  # loads .env if present
 
 DB_BACKEND = os.getenv("DB_BACKEND", "mysql").lower()  # 'mysql' or 'postgres'
 DB_USER = os.getenv("DB_USER", "root")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "LuyandaZuma007")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "")
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "3306")   # default mysql port
 DB_NAME = os.getenv("DB_NAME", "musemotion_db")
-EXCEL_PATH = os.getenv("EXCEL_PATH", r"C:\Users\luyan\Documents\Luyanda_Dev\capaciti projects\practiceapp\MuseMotion_data.xlsx")
+# --- Use the CSV file path ---
+DATA_PATH = os.getenv("DATA_PATH", "musemotion_databse.csv")
 
 # driver strings
 if DB_BACKEND == "mysql":
@@ -32,62 +33,65 @@ else:
 print("Using engine:", engine_url)
 engine = create_engine(engine_url, echo=False)
 
-# --- Read Excel
-excel_path = Path(EXCEL_PATH)
-if not excel_path.exists():
-    raise FileNotFoundError(f"Excel file not found: {excel_path}")
+# --- Read CSV ---
+data_path = Path(DATA_PATH)
+if not data_path.exists():
+    raise FileNotFoundError(f"Data file not found: {data_path}")
 
-df = pd.read_excel(excel_path)
-print("Loaded Excel with shape:", df.shape)
+# --- Define your 11 columns in order ---
+# We will use these as the column names for the DataFrame
+column_names = [
+    "vin",
+    "city",
+    "year",
+    "make",
+    "model",
+    "vehicle_type",
+    "eligibility",
+    "electric_range",
+    "vehicle_id",
+    "location",
+    "utility"
+]
 
-# --- Clean columns: make strings, replace spaces and weird chars
-df.columns = [str(c).strip() for c in df.columns]
+# Read the CSV. 
+# We assume the first row is data, not headers (header=None).
+# We assign the correct column_names.
+df = pd.read_csv(data_path, header=None, names=column_names)
+print("Loaded CSV with shape:", df.shape)
 
-# If your file has ambiguous headers (like VIN values as header), you may want to manually set column names.
-# Example mapping — adjust if the first 15 columns are known:
-if len(df.columns) == 11:
-    df.columns = [
-        "VIN",
-        "City",
-        "Year",
-        "Make",
-        "Model",
-        "Vehicle_Type",
-        "Eligibility",
-        "Electric_Range",
-        "Latitude",
-        "Longitude",
-        "Utility"
-    ]
-else:
-    # Generic normalized names
-    df.columns = [re.sub(r"\\s+", "_", c).replace("-", "_") for c in df.columns]
+# --- Clean columns: (Already done by assigning names) ---
 
-# Convert datatypes
+# --- Convert datatypes ---
+# Use the lowercase column names we just assigned
 if "year" in df.columns:
     df["year"] = pd.to_numeric(df["year"], errors="coerce").astype("Int64")
-if "odometer" in df.columns:
-    df["odometer"] = pd.to_numeric(df["odometer"], errors="coerce").astype("Int64")
-if "some_id" in df.columns:
-    df["some_id"] = pd.to_numeric(df["some_id"], errors="coerce").astype("Int64")
+if "electric_range" in df.columns:
+    df["electric_range"] = pd.to_numeric(df["electric_range"], errors="coerce").astype("Int64")
+if "vehicle_id" in df.columns:
+    df["vehicle_id"] = pd.to_numeric(df["vehicle_id"], errors="coerce").astype("Int64")
 
-# Extract lat/long from geom_wkt if present
-def extract_latlon(wkt):
+
+# --- Extract lat/long from 'location' column ---
+# This regex is for: POINT (lon lat)
+point_re = re.compile(r"POINT\s*\(\s*([-\d\.]+)\s+([-\d\.]+)\s*\)")
+
+def extract_latlon(point_str):
     try:
-        if not isinstance(wkt, str):
+        if not isinstance(point_str, str):
             return (None, None)
-        # Expect: POINT (_lon_ _lat_) or POINT (_lon_ _lat)
-        m = re.search(r"POINT\s*\(\s*([+-]?[0-9]*\.?[0-9]+)\s+([+-]?[0-9]*\.?[0-9]+)\s*\)", wkt)
-        if m:
-            lon = float(m.group(1))
-            lat = float(m.group(2))
+        match = point_re.search(str(point_str))
+        if match:
+            lon = float(match.group(1)) # Longitude is first
+            lat = float(match.group(2)) # Latitude is second
             return (lat, lon)
     except Exception:
         pass
     return (None, None)
 
-if "geom_wkt" in df.columns:
-    lat_lon = df["geom_wkt"].apply(lambda w: extract_latlon(w))
+# Check for the 'location' column (lowercase)
+if "location" in df.columns:
+    lat_lon = df["location"].apply(lambda w: extract_latlon(w))
     df["latitude"] = lat_lon.apply(lambda t: t[0])
     df["longitude"] = lat_lon.apply(lambda t: t[1])
 else:
@@ -98,40 +102,41 @@ else:
 cols = [c for c in df.columns if c not in ("latitude", "longitude")] + ["latitude", "longitude"]
 df = df[cols]
 
-# --- Create table if not exists (DML differs slightly between MySQL and Postgres)
+# --- Create table if not exists (DML differs slightly between MySQL and Postgres) ---
+# Updated to match your 11 columns + lat/lon
 if DB_BACKEND == "mysql":
     create_table_stmt = """
     CREATE TABLE IF NOT EXISTS musemotion (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      vin VARCHAR(50),
+      vin VARCHAR(50) UNIQUE,
       city VARCHAR(100),
       year INT,
       make VARCHAR(50),
       model VARCHAR(100),
       vehicle_type VARCHAR(255),
-      eligibility_reason VARCHAR(255),
-      odometer INT,
-      some_id BIGINT,
-      geom_wkt VARCHAR(255),
+      eligibility VARCHAR(255),
+      electric_range INT,
+      vehicle_id BIGINT,
+      location VARCHAR(255),
       utility VARCHAR(255),
       latitude DOUBLE,
       longitude DOUBLE
     );
     """
-else:
+else: # Postgres
     create_table_stmt = """
     CREATE TABLE IF NOT EXISTS musemotion (
       id SERIAL PRIMARY KEY,
-      vin VARCHAR(50),
+      vin VARCHAR(50) UNIQUE,
       city VARCHAR(100),
       year INT,
       make VARCHAR(50),
       model VARCHAR(100),
       vehicle_type VARCHAR(255),
-      eligibility_reason VARCHAR(255),
-      odometer INT,
-      some_id BIGINT,
-      geom_wkt VARCHAR(255),
+      eligibility VARCHAR(255),
+      electric_range INT,
+      vehicle_id BIGINT,
+      location VARCHAR(255),
       utility VARCHAR(255),
       latitude DOUBLE PRECISION,
       longitude DOUBLE PRECISION
@@ -141,10 +146,12 @@ else:
 with engine.connect() as conn:
     conn.execute(text(create_table_stmt))
     conn.commit()
-print("Ensured table exists.")
+print("Ensured table 'musemotion' exists.")
 
-# --- Load data
-# For idempotence you might want upsert logic. For simplicity we append.
-# Use to_sql for small/medium tables. For large loads use COPY (Postgres) or LOAD DATA (MySQL).
+# --- Load data ---
+# We use 'append'. If you run this script multiple times,
+# it will add duplicate data unless you clear the table first.
+# (The UNIQUE constraint on 'vin' might cause errors if you re-run,
+# which is why the 'upsert' logic in your other script is a good idea)
 df.to_sql("musemotion", con=engine, if_exists="append", index=False, method="multi", chunksize=500)
 print("Loaded rows:", len(df))
