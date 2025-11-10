@@ -1,5 +1,6 @@
  # MuseMotion: Electric Vehicle Data Analysis & Dashboard
  <h3>"From insight to ignition"</h3>  
+ Link: https://week4-musemotion-7rxfcytyna5vt9batbjv3q.streamlit.app/
 
 MuseMotion is a data engineering platform built to process, analyze, and visualize insights from electric vehicle (EV) datasets. It automates data ingestion, transformation, and cloud-based storage using Python-powered ETL pipelines and advanced SQL queries.
 By transforming raw EV data into structured intelligence, MuseMotion bridges data engineering and sustainability—helping teams extract meaningful insights that drive innovation in the electric mobility space. 
@@ -29,43 +30,9 @@ Cloud Platform:
 - Microsoft Azure.
 - Streamlit for Dashboard creation.
 
-## 📷 Project Structure
+## 📷 Dashboard
 
-```
-MuseMotion/  
-├── data/                   # Data storage folder.  
-│   ├── raw/                # Unprocessed CSV/JSON files (source data).  
-│   └── processed/          # Cleaned and transformed datasets ready for analysis.  
-│ 
-├── sql/                    # SQL-related scripts and schema definitions.  
-│   ├── schema.sql          # Database schema creation and table relationships.  
-│   ├── queries.sql         # Analysis queries (joins, aggregations, CTEs, CRUD).  
-│   └── analysis.sql        # Insight-driven queries and reports.  
-│ 
-├── src/                    # Core Python ETL code. 
-│   ├── extract.py          # Data extraction from local or external sources. 
-│   ├── transform.py        # Data cleaning, formatting, and validation. 
-│   ├── load.py             # Load processed data into SQLite and Azure SQL. 
-│   └── utils.py            # Helper functions (logging, config, error handling). 
-│ 
-├── dashboard/              # Optional visualization interface. 
-│   └── app.py              # Streamlit dashboard for data exploration and metrics. 
-│ 
-├── config/                 # Configuration and environment setup. 
-│   ├── .env.example        # Template for environment variables. 
-│   └── azure_config.json   # Azure connection details (non-sensitive placeholders). 
-│ 
-├── tests/                  # Unit and integration tests for ETL components. 
-│ ├── test_etl.py           # Tests for data extraction, transformation, and loading. 
-│ └── test_sql.py           # Tests for SQL queries and schema validation. 
-│ 
-├── requirements.txt         # Project dependencies (pandas, SQLAlchemy, azure-storage-blob, Streamlit, etc.) 
-├── README.md                # Project documentation (this file). 
-└── docs/                    # Documentation and sprint planning.
-  ├── sprint_plan_week4.md   # Week 4 sprint overview and team tasks. 
-  └── architecture_diagram.png # Visual diagram of ETL and cloud architecture.
 
-```
 
 ## 🗓️ Future Improvements
 - Long-Term Tracking: Extend data collection to analyze EV performance over time, not just single snapshots.
@@ -82,8 +49,8 @@ This project was created as part of a coding bootcamp group's Data Pipeline Buil
 | Member | Role | Responsibilities |
 |---------|------|------------------|
 | **Aobakwe Modillane** | Scrum Master. | Project management, repository setup, dashboard development, cloud integration, documentation. |
-| **Boikanyo Maswi** | Junior Developer. | SQL scripts, ETL logic, README & repo documentation, README.md, repo about. |
-| **Luyanda Zuma** | Junior Develper. | SQL scripts, ETL logic, README & repo documentation. |
+| **Boikanyo Maswi** | Junior Developer. | SQL scripts, ETL logic, Streamlit dashboard, README & repo documentation, README.md, repo about. |
+| **Luyanda Zuma** | Junior Develper. | SQL scripts, ETL logic, Streamlit dashboard, README & repo documentation. |
 | **Nqobile Masombuka** | Junior Developer. | Excel data cleaning, documentation, README.md. |
 
 <h3>Made with 💜 by Git Girls.</h3>  
