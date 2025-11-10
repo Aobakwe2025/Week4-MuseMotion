@@ -33,7 +33,7 @@ city = st.sidebar.multiselect(
     default=df["city"].unique()
 )
 
-customer_type = st.sidebar.multiselect(
+model_type = st.sidebar.multiselect(
     "Select the Model Type:",
     options=df["model"].unique(),
     default=df["model"].unique(),
@@ -99,7 +99,7 @@ fig_make_city = px.bar(
     x=make_by_city.index,
     y="make",
     title="<b>Vehicle makes in each city</b>",
-    color_discrete_sequence=["#0083B8"] * len(sales_by_hour),
+    color_discrete_sequence=["#0083B8"] * len(make_by_city)),
     template="plotly_white",
 )
 fig_make_city.update_layout(
