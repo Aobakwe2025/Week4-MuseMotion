@@ -1,6 +1,6 @@
  # MuseMotion: Electric Vehicle Data Analysis & Dashboard
  <h3>"From insight to ignition"</h3>  
- Link: https://week4-musemotion-7rxfcytyna5vt9batbjv3q.streamlit.app/
+
 
 MuseMotion is a data engineering platform built to process, analyze, and visualize insights from electric vehicle (EV) datasets. It automates data ingestion, transformation, and cloud-based storage using Python-powered ETL pipelines and advanced SQL queries.
 By transforming raw EV data into structured intelligence, MuseMotion bridges data engineering and sustainability—helping teams extract meaningful insights that drive innovation in the electric mobility space. 
@@ -31,6 +31,8 @@ Cloud Platform:
 - Streamlit for Dashboard creation.
 
 ## 📷 Dashboard
+ Link: https://week4-musemotion-7rxfcytyna5vt9batbjv3q.streamlit.app/
+ 
 <img src="dashboardpic/Screenshot 2025-11-10 144753.png" alt="dashboard picture 1" width="1339" height="610">
 <img src="dashboardpic/Screenshot 2025-11-10 145003.png" alt="dashboard picture 1" width="1339" height="610">
 
