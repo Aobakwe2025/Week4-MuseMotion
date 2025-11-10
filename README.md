@@ -31,7 +31,8 @@ Cloud Platform:
 - Streamlit for Dashboard creation.
 
 ## 📷 Dashboard
-
+<img src="dashboardpic/Screenshot 2025-11-10 144753.png" alt="dashboard picture 1" width="1339" height="610">
+<img src="dashboardpic/Screenshot 2025-11-10 145003.png" alt="dashboard picture 1" width="1339" height="610">
 
 
 ## 🗓️ Future Improvements
