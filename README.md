@@ -14,7 +14,6 @@ Our goal was to create a working prototype that integrates SQL, Python, and Azur
 SQL Analysis: Advanced queries (joins, aggregations, subqueries, CRUD operations) for EV data insights.
 - Cloud Integration (Azure): Uploads both raw and processed data to Azure Blob Storage and connects to Azure SQL Database.
 - Data Quality Checks: Cleans, validates, and logs data transformations for accuracy and consistency.
-- Visualization Dashboard: Streamlit dashboard for viewing EV insights and monitoring pipeline performance.
 - Scalable Design: Supports local SQLite testing and cloud deployment for production-ready workflows.
 
 ## ⛓ Tech Stack
@@ -24,9 +23,6 @@ Database Analysis:
 - MySQL Database.  
 - Pandas analysis.  
 
-Dashboard Development:  
-- Python 3x as primary programming language.  
-- Visualisation library: Streamlit.  
 
 Cloud Platform:   
 - Microsoft Azure.
