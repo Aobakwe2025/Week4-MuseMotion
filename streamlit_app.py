@@ -46,7 +46,7 @@ gender = st.sidebar.multiselect(
 )
 
 df_selection = df.query(
-    "City == @city & model ==@model & make == @make"
+    "city == @city & model ==@model & make == @make"
 )
 
 # Check if the dataframe is empty:
@@ -59,9 +59,9 @@ st.title(":bar_chart: Muse Motion Electric Vehicles")
 st.markdown("##")
 
 # kpi
-total_vehicles = int(df_selection["Total"].sum())
-average_year = round(df_selection["Year"].mean(), 1)
-average_electric_range = round(df_selection["Total"].mean(), 2)
+total_vehicles = int(df_selection["model"].sum())
+average_year = round(df_selection["year"].mean(), 1)
+average_electric_range = round(df_selection["electric_range"].mean(), 2)
 
 left_column, middle_column, right_column = st.columns(3)
 with left_column:
@@ -77,10 +77,10 @@ with right_column:
 st.markdown("""---""")
 
 # Electric vehicles by make (bar chart)
-vehicles_by_make = df_selection.groupby(by=["Make"])[["Total"]].sum().sort_values(by="Total")
+vehicles_by_make = df_selection.groupby(by=["make"])[["model"]].sum().sort_values(by="model")
 fig_vehicle_make = px.bar(
     vehicles_by_make,
-    x="Total",
+    x="model",
     y=vehicles_by_make.index,
     orientation="h",
     title="<b>Vehicle by Make/b>",
