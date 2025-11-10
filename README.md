@@ -14,6 +14,7 @@ Our goal was to create a working prototype that integrates SQL, Python, and Azur
 SQL Analysis: Advanced queries (joins, aggregations, subqueries, CRUD operations) for EV data insights.
 - Cloud Integration (Azure): Uploads both raw and processed data to Azure Blob Storage and connects to Azure SQL Database.
 - Data Quality Checks: Cleans, validates, and logs data transformations for accuracy and consistency.
+- Visualization Dashboard: Streamlit dashboard for viewing EV insights and monitoring pipeline performance.
 - Scalable Design: Supports local SQLite testing and cloud deployment for production-ready workflows.
 
 ## ⛓ Tech Stack
@@ -26,6 +27,7 @@ Database Analysis:
 
 Cloud Platform:   
 - Microsoft Azure.
+- Streamlit for Dashboard creation.
 
 ## 📷 Project Structure
 
@@ -68,7 +70,7 @@ MuseMotion/
 ## 🗓️ Future Improvements
 - Long-Term Tracking: Extend data collection to analyze EV performance over time, not just single snapshots.
 - Predictive Analytics: Integrate models to forecast EV demand and charging patterns.
-- Enhanced Visualization: Expand Streamlit or Power BI dashboards for deeper insights.
+- Enhanced Visualization: Expand Streamlit dashboards for deeper insights.
 - Automated Notifications: Use Azure Logic Apps to send alerts for failed uploads or pipeline errors.
 - Full Azure Integration: Transition from SQLite to fully cloud-hosted Azure SQL workflows.
 
